@@ -1,16 +1,6 @@
 <html lang="en-us"><script src="https://pygame-web.github.io/cdn/0.9.3/pythons.js" type=module id="site" data-python="python3.12" data-LINES=42 data-COLUMNS=132 data-os="vtx,snd,gui" async defer>#<!--
 
-print("""
-Loading servive from servive.apk
-    Pygbag Version : 0.9.3
-    Python  : 3.12
-    CDN URL : https://pygame-web.github.io/cdn/0.9.3/
-""")
-
-import sys
-import asyncio
-import platform
-import json
+import sys, asyncio, platform, json
 from pathlib import Path
 
 async def custom_site():
@@ -23,7 +13,7 @@ async def custom_site():
     appdir = Path(f"/data/data/{bundle}")
     appdir.mkdir()
 
-    if platform.window.location.host.find('.itch.zone')>0:
+    if platform.window.location.host.find('.itch.zone') > 0:
         import zipfile
         async with platform.fopen("servive.apk", "rb") as archive:
             with zipfile.ZipFile(archive) as zip_ref:
@@ -35,9 +25,9 @@ async def custom_site():
             tar.extractall(path=appdir.as_posix(), filter='tar')
             tar.close()
 
-    platform.run_main(PyConfig, loaderhome= appdir / "assets", loadermain=None)
+    platform.run_main(PyConfig, loaderhome=appdir / "assets", loadermain=None)
 
-    while embed.counter()<0:
+    while embed.counter() < 0:
         await asyncio.sleep(.1)
 
     main = appdir / "assets" / "main.py"
@@ -52,22 +42,18 @@ async def custom_site():
     __import__(__name__).__file__ = main
 
     def ui_callback(pkg):
-        platform.window.infobox.innerText = f"로딩 중..."
+        platform.window.infobox.innerText = "로딩 중..."
 
     await shell.source(main, callback=ui_callback)
 
     platform.window.infobox.style.display = "none"
     platform.window.config.gui_divider = 1
     platform.window.window_resize()
-
     shell.interactive()
 
-asyncio.run( custom_site() )
-
+asyncio.run(custom_site())
 
 # BEGIN BLOCK
-#
-# do not alter that comment block it is separating python code from html code
 # =============================================================================
 # --></script><head><!--
 //=============================================================================
@@ -75,26 +61,48 @@ asyncio.run( custom_site() )
 // END BLOCK
 
 config = {
-    xtermjs : "1" ,
-    _sdl2 : "canvas",
-    user_canvas : 0,
+    xtermjs       : "1",
+    _sdl2         : "canvas",
+    user_canvas   : 0,
     user_canvas_managed : 0,
-    gui_divider : 2,
-    ume_block : 1,
-    can_close : 0,
-    archive : "servive",
-    gui_debug : 2,
-    cdn : "https://pygame-web.github.io/cdn/0.9.3/",
-    autorun : 0,
-    PYBUILD : "3.12",
-    fb_ar   :  1.77,
-    fb_width : "1280",
-    fb_height : "720"
+    gui_divider   : 1,
+    ume_block     : 1,
+    can_close     : 0,
+    archive       : "servive",
+    gui_debug     : 2,
+    cdn           : "https://pygame-web.github.io/cdn/0.9.3/",
+    autorun       : 0,
+    PYBUILD       : "3.12",
+    fb_ar         : 1.77,
+    fb_width      : "1280",
+    fb_height     : "720"
 }
 
+/* Called by pygbag AFTER it applies its own inline styles.
+   We forcefully override everything here. */
 function show_infobox() {
     var ib = document.getElementById('infobox');
-    if (ib) ib.style.display = 'block';
+    if (!ib) return;
+    /* Override pygbag's green/blue inline styles */
+    ib.style.cssText = [
+        'display:block',
+        'position:fixed',
+        'left:50%',
+        'top:50%',
+        'transform:translate(-50%, 100px)',
+        'background:transparent',
+        'color:#3cd2e1',
+        'font-size:22px',
+        'font-weight:bold',
+        'font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif',
+        'text-align:center',
+        'white-space:nowrap',
+        'border:none',
+        'padding:0',
+        'z-index:9999',
+        'animation:survival-blink 1.5s ease-in-out infinite',
+        'pointer-events:none'
+    ].join(';');
 }
 
 </script>
@@ -112,41 +120,47 @@ function show_infobox() {
 
         body {
             background: #12121c;
-            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
-            width: 100vw; height: 100vh;
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
         }
 
-        /* game-style grid lines */
+        /* subtle moving grid */
         body::before {
             content: '';
             position: fixed; inset: 0;
             background-image:
-                linear-gradient(to right, rgba(28,28,42,0.8) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(28,28,42,0.8) 1px, transparent 1px);
+                linear-gradient(rgba(28,28,42,0.9) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(28,28,42,0.9) 1px, transparent 1px);
             background-size: 100px 100px;
             pointer-events: none;
             z-index: 1;
         }
 
         canvas.emscripten {
-            border: 0px none;
-            background-color: transparent;
-            width: 100%; height: 100%;
-            z-index: 5;
-            padding: 0; margin: 0 auto;
             position: absolute;
-            top: 0; bottom: 0; left: 0; right: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100% !important;
+            height: 100% !important;
+            border: none;
+            padding: 0;
+            margin: 0;
+            background: transparent;
+            z-index: 5;
         }
 
-        /* hide all pygbag debug elements */
-        #transfer, #status, #progress, #pyconsole, #crt { display: none !important; }
-        div.emscripten, div.emscripten_border { display: none !important; }
+        /* hide all debug / progress elements */
+        #transfer, #pyconsole, #crt,
+        #status, #progress,
+        div.emscripten, div.emscripten_border {
+            display: none !important;
+        }
 
-        /* ── splash overlay (sits above canvas, z-index 20) ─────── */
+        /* ── Splash overlay (above canvas) ──────────────────────── */
         #splash-bg {
             position: fixed; inset: 0;
-            z-index: 20;
+            z-index: 100;
             background: #12121c;
             display: flex;
             flex-direction: column;
@@ -154,82 +168,63 @@ function show_infobox() {
             justify-content: center;
             gap: 0;
             pointer-events: none;
+            transition: opacity 0.4s ease;
         }
 
         #splash-bg .s-title {
-            font-size: 76px;
+            font-size: 80px;
             font-weight: 900;
-            letter-spacing: 8px;
+            letter-spacing: 10px;
             color: #ffd82d;
-            text-shadow: 0 0 40px rgba(255, 216, 45, 0.5);
-            margin-bottom: 12px;
+            text-shadow: 0 0 48px rgba(255,216,45,0.45);
+            margin-bottom: 10px;
         }
 
         #splash-bg .s-sub {
-            font-size: 20px;
-            color: #787887;
-            letter-spacing: 3px;
-            margin-bottom: 48px;
-        }
-
-        #splash-bg .s-divider {
-            width: 320px;
-            height: 1px;
-            background: linear-gradient(to right, transparent, #2d2d45, transparent);
-            margin-bottom: 40px;
+            font-size: 18px;
+            color: #55556a;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 52px;
         }
 
         #splash-bg .s-bar-wrap {
-            width: 260px; height: 3px;
+            width: 220px;
+            height: 2px;
             background: #1c1c2a;
             border-radius: 2px;
             overflow: hidden;
-            margin-bottom: 32px;
         }
         #splash-bg .s-bar-fill {
             height: 100%;
             background: linear-gradient(to right, #3cd2e1, #3c78dc);
             border-radius: 2px;
-            animation: loadbar 2.2s ease-in-out infinite;
+            animation: survival-bar 2s ease-in-out infinite;
         }
 
-        @keyframes loadbar {
-            0%   { width: 0%; opacity: 1; }
-            70%  { width: 90%; opacity: 1; }
-            95%  { width: 100%; opacity: 0.4; }
-            100% { width: 100%; opacity: 1; }
+        @keyframes survival-bar {
+            0%          { width: 0%;   opacity: 1; }
+            70%         { width: 88%;  opacity: 1; }
+            90%, 100%   { width: 100%; opacity: 0.5; }
         }
 
-        /* ── pygbag infobox: minimal, just shows status text ─────── */
+        @keyframes survival-blink {
+            0%, 100%    { opacity: 1;    }
+            50%         { opacity: 0.2;  }
+        }
+
+        /* infobox default before JS overrides it */
         #infobox {
-            position: fixed;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, 90px);  /* below center, below the bar */
-            z-index: 21;
-            background: transparent;
-            color: #3cd2e1;
-            font-size: 20px;
-            font-weight: bold;
-            text-align: center;
-            white-space: nowrap;
-            animation: blink 1.5s ease-in-out infinite;
-            pointer-events: none;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50%       { opacity: 0.25; }
+            display: none;
         }
     </style>
 
     <script src="https://pygame-web.github.io/cdn/0.9.3//browserfs.min.js"></script>
 
 </head>
-
 <body>
 
-    <!-- pygbag required elements (all hidden) -->
+    <!-- required pygbag elements (all hidden via CSS) -->
     <div id="transfer">
         <div class="emscripten" id="status">Downloading...</div>
         <div class="emscripten">
@@ -243,34 +238,31 @@ function show_infobox() {
     <canvas class="emscripten" id="canvas3d" width="1280px" height="720px"
         oncontextmenu="event.preventDefault()" tabindex=1 hidden></canvas>
 
-    <!-- ── My custom splash background ───────────────────────── -->
+    <!-- My splash screen (sits above canvas) -->
     <div id="splash-bg">
         <div class="s-title">SURVIVAL</div>
         <div class="s-sub">Wave Survival Game</div>
-        <div class="s-divider"></div>
         <div class="s-bar-wrap"><div class="s-bar-fill"></div></div>
     </div>
 
-    <!-- pygbag controls this element's text and visibility -->
+    <!-- pygbag controls this element's text & visibility -->
     <div id="infobox">로딩 중...</div>
 
     <div id=html></div>
 
-    <div id=crt class=bottomright>
+    <div id=crt>
         <div id="system" hidden>
-            <div id=load_min>min</div><div id=load_avg>avg</div><div id=load_max>max</div>
-            <button id="aiostop" disabled>AIO ⏏︎</button>
+            <button id="aiostop" disabled>AIO</button>
             <button id="aiopaused_true" disabled>AIO ■</button>
             <button id="aiopaused_false" disabled>AIO ▶</button>
             <button id="pygame_mixer_music_pause" disabled>Music ■</button>
+            <div id=load_min></div><div id=load_avg></div><div id=load_max></div>
             <button id="load_rst" disabled>RESET</button>
-            <div id="level">(battery level unknown)</div>
-            <div id="stateBattery">(charging state unknown)</div>
+            <div id="level"></div><div id="stateBattery"></div>
         </div>
         <div id=box class="emscripten_border" hidden=true>
-            <div id="info" class="trinfo"></div>
-            <iframe id="iframe" class="framed" name="iframe"
-                width="470px" height="90%" allowtransparency="true"
+            <div id="info"></div>
+            <iframe id="iframe" name="iframe" width="470px" height="90%"
                 frameborder="1" allowfullscreen="true"
                 sandbox="allow-same-origin allow-top-navigation allow-scripts allow-pointer-lock"
                 allow="autoplay; fullscreen *; geolocation; microphone; camera; midi; xr-spatial-tracking; gamepad; gyroscope; accelerometer; xr; cross-origin-isolated"
@@ -290,22 +282,22 @@ function show_infobox() {
 
     <script type="application/javascript">
 
-    globalThis.__canvas_resized = (self, ecw, ech) => {
-        console.warn("TODO: panda3d canvas monitor", self, ecw, ech)
-    }
+    globalThis.__canvas_resized = (self, ecw, ech) => {}
 
     async function custom_onload(debug_hidden) {
         console.log(__FILE__, "custom_onload")
         pyconsole.hidden = debug_hidden
-        system.hidden = debug_hidden
-        transfer.hidden = debug_hidden
-        info.hidden = debug_hidden
-        box.hidden = debug_hidden
+        system.hidden    = debug_hidden
+        transfer.hidden  = debug_hidden
+        info.hidden      = debug_hidden
+        box.hidden       = debug_hidden
+
+        /* pygbag may have applied inline green/blue styles — override now */
         show_infobox()
     }
 
-    function custom_prerun(){ console.log(__FILE__, "custom_prerun") }
-    function custom_postrun(){ console.log(__FILE__, "custom_postrun") }
+    function custom_prerun()  { console.log(__FILE__, "custom_prerun")  }
+    function custom_postrun() { console.log(__FILE__, "custom_postrun") }
 
     function debug() {
         python.config.debug = true
@@ -314,25 +306,27 @@ function show_infobox() {
         window_resize()
     }
 
-    function info_inline(data){ document.getElementById("info").innerHTML = data }
-    function info_online(url) {
-        fetch(url).then(r=>r.text()).then(h=>info_inline(h)).catch(e=>console.warn(e));
+    function info_inline(data) { document.getElementById("info").innerHTML = data }
+    function info_online(url)  {
+        fetch(url).then(r => r.text()).then(h => info_inline(h)).catch(e => console.warn(e))
     }
-    function frame_online(url) { window.frames["iframe"].location = url; }
+    function frame_online(url) { window.frames["iframe"].location = url }
 
-    // Hide the splash background when pygbag hides the infobox
+    /* Hide splash when pygbag hides the infobox (game started) */
     (function() {
-        var splash = document.getElementById('splash-bg');
-        var ib = document.getElementById('infobox');
-        if (!splash || !ib) return;
+        var splash = document.getElementById('splash-bg')
+        var ib     = document.getElementById('infobox')
+        if (!splash || !ib) return
         var obs = new MutationObserver(function() {
             if (ib.style.display === 'none') {
-                splash.style.display = 'none';
-                obs.disconnect();
+                splash.style.opacity = '0'
+                splash.style.pointerEvents = 'none'
+                setTimeout(function(){ splash.style.display = 'none' }, 400)
+                obs.disconnect()
             }
-        });
-        obs.observe(ib, { attributes: true, attributeFilter: ['style'] });
-    })();
+        })
+        obs.observe(ib, { attributes: true, attributeFilter: ['style'] })
+    })()
 
     </script>
 

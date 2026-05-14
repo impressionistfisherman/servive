@@ -80,6 +80,7 @@ config = {
 
 /* pygbag calls this to show the infobox.
    Colors/font are locked by CSS !important — only set layout here. */
+var _ibCorrectText = '화면을 클릭하면 시작됩니다';
 function show_infobox() {
     var ib = document.getElementById('infobox');
     if (!ib) return;
@@ -90,6 +91,7 @@ function show_infobox() {
     ib.style.transform  = 'translate(-50%, 110px)';
     ib.style.zIndex     = '9999';
     ib.style.pointerEvents = 'none';
+    ib.innerText = _ibCorrectText;
 }
 
 </script>
@@ -314,6 +316,19 @@ function show_infobox() {
         var splash = document.getElementById('splash-bg')
         var ib     = document.getElementById('infobox')
         if (!splash || !ib) return
+
+        /* Keep infobox text correct whenever anything changes it */
+        var _fixing = false
+        var textObs = new MutationObserver(function() {
+            if (!_fixing && ib.style.display !== 'none' && ib.innerText !== _ibCorrectText) {
+                _fixing = true
+                ib.innerText = _ibCorrectText
+                _fixing = false
+            }
+        })
+        textObs.observe(ib, { childList: true, subtree: true, characterData: true })
+
+        /* Hide splash when pygbag sets infobox to display:none (game started) */
         var obs = new MutationObserver(function() {
             if (ib.style.display === 'none') {
                 splash.style.opacity = '0'

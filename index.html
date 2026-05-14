@@ -78,31 +78,18 @@ config = {
     fb_height     : "720"
 }
 
-/* Called by pygbag AFTER it applies its own inline styles.
-   We forcefully override everything here. */
+/* pygbag calls this to show the infobox.
+   Colors/font are locked by CSS !important — only set layout here. */
 function show_infobox() {
     var ib = document.getElementById('infobox');
     if (!ib) return;
-    /* Override pygbag's green/blue inline styles */
-    ib.style.cssText = [
-        'display:block',
-        'position:fixed',
-        'left:50%',
-        'top:50%',
-        'transform:translate(-50%, 100px)',
-        'background:transparent',
-        'color:#3cd2e1',
-        'font-size:22px',
-        'font-weight:bold',
-        'font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif',
-        'text-align:center',
-        'white-space:nowrap',
-        'border:none',
-        'padding:0',
-        'z-index:9999',
-        'animation:survival-blink 1.5s ease-in-out infinite',
-        'pointer-events:none'
-    ].join(';');
+    ib.style.display    = 'block';
+    ib.style.position   = 'fixed';
+    ib.style.left       = '50%';
+    ib.style.top        = '50%';
+    ib.style.transform  = 'translate(-50%, 110px)';
+    ib.style.zIndex     = '9999';
+    ib.style.pointerEvents = 'none';
 }
 
 </script>
@@ -213,13 +200,23 @@ function show_infobox() {
             50%         { opacity: 0.2;  }
         }
 
-        /* infobox default before JS overrides it */
+        /* infobox: CSS !important overrides any JS inline styles pygbag sets */
         #infobox {
             display: none;
+            background: transparent !important;
+            color: #3cd2e1 !important;
+            border: none !important;
+            padding: 0 !important;
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif !important;
+            font-size: 20px !important;
+            font-weight: bold !important;
+            text-align: center !important;
+            white-space: nowrap;
+            animation: survival-blink 1.5s ease-in-out infinite;
         }
     </style>
 
-    <script src="https://pygame-web.github.io/cdn/0.9.3//browserfs.min.js"></script>
+    <script src="https://pygame-web.github.io/cdn/0.9.3/browserfs.min.js"></script>
 
 </head>
 <body>

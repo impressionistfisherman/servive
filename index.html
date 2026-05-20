@@ -32,12 +32,6 @@ async def custom_site():
 
     main = appdir / "assets" / "main.py"
 
-    if not platform.window.MM.UME:
-        __import__(__name__).__file__ = main
-        platform.window.infobox.innerText = "\ud654\uba74\uc744 \ud074\ub9ad\ud558\uba74 \uc2dc\uc791\ub429\ub2c8\ub2e4"
-        while not platform.window.MM.UME:
-            await asyncio.sleep(.1)
-
     await TopLevel_async_handler.start_toplevel(platform.shell, console=window.python.config.debug)
     __import__(__name__).__file__ = main
 
@@ -66,7 +60,7 @@ config = {
     user_canvas   : 0,
     user_canvas_managed : 0,
     gui_divider   : 1,
-    ume_block     : 1,
+    ume_block     : 0,
     can_close     : 0,
     archive       : "servive",
     gui_debug     : 2,
